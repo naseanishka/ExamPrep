@@ -61,10 +61,11 @@ export const signUp = async (req, res) => {
         console.log(token);
 
         res.cookie("token", token, {
-            httpOnly: true, // cookie cannot be accessed only on HTTP requests (by client-side scripts),
-            sameSite: "strict", // cookie will only be sent in requests originating from the same site, 
+            httpOnly: true, // cookie cannot be accessed by client-side scripts
+            // For cross-site requests (Vercel ↔ Render), cookies must be SameSite=None and Secure in production
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             secure: process.env.NODE_ENV === 'production',
-            maxAge: 30 * 24 * 60 * 60 * 1000 // cookie will expire after 30 days
+            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
         })
 
         console.log(newUser)
@@ -113,7 +114,7 @@ export const signIn = async (req, res) => {
 
         res.cookie("token", token, {
             httpOnly: true,
-            sameSite: "strict",
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             secure: process.env.NODE_ENV === 'production',
             maxAge: 30 * 24 * 60 * 60 * 1000
         });
@@ -151,5 +152,20 @@ export const getCurrentUser = async (req, res) => {
             message: "Internal Server error",
             error: error.message
         });
+    }
+};
+
+// Sign out - clear auth cookie
+export const signOut = async (_req, res) => {
+    try {
+        res.clearCookie('token', {
+            httpOnly: true,
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+            secure: process.env.NODE_ENV === 'production',
+            path: '/',
+        });
+        return res.status(200).json({ message: 'Signed out successfully' });
+    } catch (error) {
+        return res.status(500).json({ message: 'Failed to sign out', error: error.message });
     }
 };

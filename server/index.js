@@ -13,9 +13,14 @@ const app = express();
 const PORT = process.env.PORT || 3002;
 // const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:3000';
 // const allowedOrigins = [CLIENT_ORIGIN];
+// Respect comma-separated list in CLIENT_URL and trim spaces
 const allowedOrigins = process.env.CLIENT_URL
-    ? process.env.CLIENT_URL.split(',')
+    ? process.env.CLIENT_URL.split(',').map(o => o.trim()).filter(Boolean)
     : ['http://localhost:3000'];
+
+// Trust proxy is required on platforms like Render/Heroku for secure cookies
+// so Express knows the original protocol (https) when behind a proxy
+app.set('trust proxy', 1);
 
 // Connect to Database
 connectDB();
