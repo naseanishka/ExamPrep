@@ -10,9 +10,12 @@ import resultRoutes from './routes/result.routes.js';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:3001';
-const allowedOrigins = [CLIENT_ORIGIN];
+const PORT = process.env.PORT || 3002;
+// const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:3000';
+// const allowedOrigins = [CLIENT_ORIGIN];
+const allowedOrigins = process.env.CLIENT_URL
+    ? process.env.CLIENT_URL.split(',')
+    : ['http://localhost:3000'];
 
 // Connect to Database
 connectDB();
