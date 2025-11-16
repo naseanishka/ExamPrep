@@ -68,11 +68,13 @@ const TakeExam = () => {
 
         try {
             const submissionData = {
-                exam: exam._id,
-                answers: Object.entries(answers).map(([questionIndex, selectedOption]) => ({
-                    question: exam.questions[questionIndex]._id,
-                    selectedOption: parseInt(selectedOption)
-                }))
+                // Backend expects `examId` and an answers array (aligned with question order)
+                examId: exam._id,
+                answers: exam.questions.map((q, idx) => {
+                    const selected = typeof answers[idx] === 'number' ? answers[idx] : (answers[idx] !== '' ? parseInt(answers[idx]) : -1);
+                    return { selectedOption: typeof selected === 'number' && !Number.isNaN(selected) ? selected : -1 };
+                }),
+                timeSpent: (exam.duration * 60) - timeRemaining
             };
 
             const response = await resultAPI.submitExam(submissionData);
