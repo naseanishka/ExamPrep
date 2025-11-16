@@ -29,7 +29,8 @@ export const examAPI = {
 
 // Result API calls
 export const resultAPI = {
-    submitExam: (resultData) => api.post('/results/submit', resultData),
+    // Backend expects POST /api/results (router POST '/'), so send to '/results'
+    submitExam: (resultData) => api.post('/results', resultData),
     getMyResults: () => api.get('/results/my'),
     getResultById: (id) => api.get(`/results/${id}`),
     getExamResults: (examId) => api.get(`/results/exam/${examId}`),
